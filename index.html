@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bid-to-Win: The Grand Reopening</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="hero">
+    <img src="/assets/banner.jpg" alt="Bid-to-Win: The Grand Reopening">
+    <div class="hero-eyebrow">eFootball &middot; Six-Club Auction Tournament</div>
+    <h1>BID-TO-WIN<span>:</span> THE GRAND REOPENING</h1>
+    <p class="sub">Register &middot; get auctioned &middot; play for your club</p>
+  </div>
+
+  <div class="wrap">
+    <div class="nav">
+      <button class="nav-btn active" data-view="register">Register</button>
+      <button class="nav-btn" data-view="directory">Registered Players</button>
+      <button class="nav-btn" data-view="clubs">Clubs</button>
+      <button class="nav-btn" data-view="standings">Standings</button>
+      <button class="nav-btn" data-view="admin">Organizer</button>
+    </div>
+
+    <!-- REGISTER -->
+    <div class="view active" id="view-register">
+      <div class="two-col">
+        <div class="panel">
+          <div class="section-title">Player Registration</div>
+          <div class="empty-state" id="registrationClosedBanner" style="display:none; margin-bottom:18px;">
+            Registration is currently closed by the organizer. Check back later.
+          </div>
+          <form id="regForm">
+            <label class="required" for="pName">Player Name</label>
+            <input type="text" id="pName" placeholder="e.g. Tanmoy Rahman" autocomplete="off">
+
+            <label class="required" for="pId">Player ID</label>
+            <input type="text" id="pId" placeholder="e.g. eFB-2049" autocomplete="off">
+
+            <label class="required" for="pDevice">Device Name</label>
+            <input type="text" id="pDevice" placeholder="e.g. PS5, PC (RTX 4060), iPhone 14" autocomplete="off">
+
+            <label class="required">Player Photo</label>
+            <div class="photo-picker">
+              <img class="photo-preview" id="photoPreview" src="" alt="" style="display:none;">
+              <div id="photoPlaceholder" class="photo-preview photo-placeholder">NO<br>PHOTO</div>
+              <div>
+                <label for="pPhoto" class="photo-picker-btn">Choose Photo</label>
+                <input type="file" id="pPhoto" accept="image/*">
+                <div class="photo-status" id="photoStatus">JPG/PNG, auto-resized</div>
+              </div>
+            </div>
+
+            <div class="error-msg" id="errMsg"></div>
+            <button type="submit" class="submit" id="submitBtn">Register Player</button>
+            <div class="success-flash" id="successFlash">Registered. You'll be assigned to a club after the auction.</div>
+          </form>
+        </div>
+
+        <div class="panel">
+          <div class="section-title">Recently Registered</div>
+          <div id="recentArea"><div class="loading">Loading...</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REGISTERED PLAYERS DIRECTORY -->
+    <div class="view" id="view-directory">
+      <div class="panel">
+        <div class="section-title">Registered Players</div>
+        <div class="roster-controls">
+          <input type="text" id="directorySearch" placeholder="Search name, ID, device or club...">
+          <select id="directoryFilter">
+            <option value="all">All players</option>
+            <option value="unassigned">Free agents only</option>
+            <option value="assigned">Assigned to a club</option>
+          </select>
+        </div>
+        <div id="directoryArea"><div class="loading">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- CLUBS -->
+    <div class="view" id="view-clubs">
+      <div class="panel">
+        <div class="section-title">Club Rosters</div>
+        <div id="teamRosterArea"><div class="loading">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- STANDINGS -->
+    <div class="view" id="view-standings">
+      <div class="panel">
+        <div class="section-title">League Table</div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>#</th><th>Club</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead>
+            <tbody id="standingsBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="section-title">Fixture Results</div>
+        <div id="matchHistoryArea"><div class="empty-state">No fixtures played yet.</div></div>
+      </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="view" id="view-admin">
+      <div class="panel" id="adminGatePanel">
+        <div class="section-title">Organizer Access</div>
+        <div class="admin-gate">
+          <input type="text" id="adminPass" placeholder="Enter organizer passcode">
+          <button id="adminUnlockBtn">Unlock</button>
+        </div>
+        <div class="error-msg" id="adminGateErr"></div>
+        <div class="admin-note">
+          Login is verified on the server — the passcode itself never reaches this page's code, only a session cookie does once you're in. Sessions expire automatically after 12 hours.
+        </div>
+      </div>
+
+      <div id="adminContent" style="display:none;">
+        <div class="locked-banner">
+          <span>Organizer session unlocked</span>
+          <button id="adminLockBtn">Log out</button>
+        </div>
+
+        <div class="panel">
+          <div class="section-title">Registration Control</div>
+          <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+            <span id="regStatusLabel" class="mono"></span>
+            <button class="btn-mini" id="toggleRegBtn">Toggle</button>
+          </div>
+          <div class="admin-note">When closed, the Register tab shows a closed notice and the form is disabled for everyone, including anyone who already has the page open.</div>
+        </div>
+
+        <div class="panel">
+          <div class="section-title">Edit Player Details</div>
+          <select id="editPlayerSelect" class="assign-select full-width">
+            <option value="">Select a player to edit...</option>
+          </select>
+          <div id="editPlayerForm" style="display:none; margin-top:14px;">
+            <label class="required">Player Name</label>
+            <input type="text" id="editName">
+            <label class="required">Player ID</label>
+            <input type="text" id="editId">
+            <label class="required">Device Name</label>
+            <input type="text" id="editDevice">
+            <label>Photo</label>
+            <div class="photo-picker">
+              <img class="photo-preview" id="editPhotoPreview" src="" alt="">
+              <div>
+                <label for="editPhotoFile" class="photo-picker-btn">Change Photo</label>
+                <input type="file" id="editPhotoFile" accept="image/*">
+                <div class="photo-status" id="editPhotoStatus">Current photo kept unless changed</div>
+              </div>
+            </div>
+            <div class="error-msg" id="editErr"></div>
+            <div class="btn-row">
+              <button class="submit" id="saveEditBtn">Save Changes</button>
+              <button class="btn-mini danger" id="deleteEditBtn">Delete Player</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="section-title">Auction &mdash; Assign Free Agents</div>
+          <div id="adminFreeAgentArea"></div>
+        </div>
+
+        <div class="panel">
+          <div class="section-title">Club Rosters &mdash; Manage</div>
+          <div id="adminTeamArea"></div>
+        </div>
+
+        <div class="panel">
+          <div class="section-title">Point Table &mdash; Enter Fixture Result</div>
+          <div class="admin-note" style="margin-bottom:16px;">
+            Each club fields 5 players for a fixture. Play all five 1v1 legs (Player A vs Player B), then enter each scoreline below. Whichever club wins more legs wins the fixture and takes 3 points; equal legs is a draw at 1 point each. Goals across all 5 legs add up to that club's GF/GA in the table.
+          </div>
+          <div class="match-form">
+            <div class="field"><label>Home club</label><select id="fixtureTeamA"></select></div>
+            <div class="field"><label>Away club</label><select id="fixtureTeamB"></select></div>
+            <button id="loadFixtureBtn">Load Rosters</button>
+          </div>
+          <div id="fixtureLegsArea"></div>
+          <div class="error-msg" id="fixtureErr"></div>
+          <button class="submit fixture-save" id="saveFixtureBtn" style="display:none;">Save Fixture Result</button>
+          <div class="section-title" style="margin-top:28px;">Fixture History</div>
+          <div id="adminMatchHistoryArea"></div>
+        </div>
+
+        <div class="panel">
+          <div class="section-title">Registration Data &amp; Player Cards</div>
+          <div class="organizer-data-actions">
+            <button id="exportCsvBtn">Export CSV</button>
+            <button id="refreshDataBtn">Refresh</button>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="dataTable">
+              <thead><tr><th>#</th><th>Photo</th><th>Name</th><th>Player ID</th><th>Club</th><th>Captain</th><th>Device</th><th>Registered</th><th></th></tr></thead>
+              <tbody id="dataTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>Registrations are visible to everyone. Organizer actions require a verified server-side login.</footer>
+  </div>
+
+<canvas id="cardCanvas" width="720" height="960" style="display:none;"></canvas>
+<script src="/app.js"></script>
+</body>
+</html>

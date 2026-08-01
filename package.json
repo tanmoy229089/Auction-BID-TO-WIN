@@ -1,0 +1,15 @@
+{
+  "name": "bid-to-win-grand-reopening",
+  "version": "1.0.0",
+  "description": "Bid-to-Win: The Grand Reopening — eFootball tournament registration, auction assignment, and league table.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "hash-password": "node scripts/hash-password.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {},
+  "license": "UNLICENSED"
+}
